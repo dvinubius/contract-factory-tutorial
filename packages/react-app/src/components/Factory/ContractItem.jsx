@@ -4,7 +4,7 @@ import { useContractReader } from "eth-hooks";
 import { Card, Descriptions } from "antd";
 import CustomAddress from "../CustomKit/CustomAddress";
 import { UserOutlined } from "@ant-design/icons";
-import { useContractLoader } from "../../hooks/custom/useContractLoader";
+import { useContractLoader } from "eth-hooks";
 import { getContractConfigWithInjected } from "../../helpers/getContractConfigWithInjected";
 
 const ContractItem = ({ openContract, contract, abi, localChainId, localProvider, userAddress }) => {
