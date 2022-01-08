@@ -31,7 +31,6 @@ const YourContract = ({ contract, injectableAbis, localProvider, userSigner, loc
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
 
-  // ** keep track of total 'threshold' needed of ETH
   const purpose = useContractReader(readContracts, "YourContract", "purpose");
   console.log("🧭 purpose:", purpose);
 
