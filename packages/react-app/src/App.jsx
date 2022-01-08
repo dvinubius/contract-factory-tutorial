@@ -287,7 +287,8 @@ function App(props) {
           <Route exact path="/">
             <div className="AppCenteredCol">
               <CreatedContractsUI
-                factoryAddress={address}
+                factoryAddress={readContracts.YourContractFactory.address}
+                userAddress={address}
                 injectableAbis={injectableAbis}
                 createdContracts={createdContracts}
                 readContracts={readContracts}
@@ -308,7 +309,8 @@ function App(props) {
               <DebugUI
                 factoryName="YourContractFactory"
                 createdContractName="YourContract"
-                factoryAddress={address}
+                factoryAddress={readContracts.YourContractFactory.address}
+                userAddress={address}
                 createdContracts={createdContracts}
                 injectableAbis={injectableAbis}
                 localChainId={localChainId}
