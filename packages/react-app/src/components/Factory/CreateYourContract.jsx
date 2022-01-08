@@ -34,6 +34,7 @@ const CreateYourContract = ({ userSigner, gasPrice, contractConfig, localChainId
       const name = form.getFieldValue("name");
       const purpose = form.getFieldValue("purpose");
       const transaction = writeContracts.YourContractFactory.createYourContract(name, purpose);
+      setTxError(false);
       tx(transaction, update => {
         if (update && (update.error || update.reason)) {
           setPendingCreate(false);
