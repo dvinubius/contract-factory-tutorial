@@ -9,15 +9,15 @@ import {
   useUserProviderAndSigner,
 } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
-import React, { useCallback, useEffect, useState } from "react";
-import { Link, Route, Switch, useLocation } from "react-router-dom";
+import React, { createContext, useCallback, useEffect, useState } from "react";
+import { BrowserRouter, Link, Route, Switch, useLocation } from "react-router-dom";
 import "./App.css";
 import { Account, Faucet, GasGauge, Header, Ramp, ThemeSwitch, FaucetHint, NetworkSwitch } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
-import { Web3ModalSetup } from "./helpers";
+import { Transactor, Web3ModalSetup } from "./helpers";
 import { useStaticJsonRPC } from "./hooks";
 import CustomNetworkDisplay from "./components/CustomKit/CustomNetworkDisplay";
 
@@ -25,6 +25,10 @@ import { useEventListener } from "eth-hooks/events/useEventListener";
 import { loadNonDeployedContractAbi } from "./helpers/loadNonDeployedAbis";
 import DebugUI from "./views/DebugUI";
 import CreatedContractsUI from "./views/CreatedContractsUI";
+import { useWindowWidth } from "@react-hook/window-size";
+import { softTextColor, swapGradient } from "./styles";
+import CustomHeader from "./components/CustomKit/CustomHeader";
+import CustomAccount from "./components/CustomKit/CustomAccount";
 
 const { ethers } = require("ethers");
 /*
@@ -62,7 +66,12 @@ const providers = [
   "https://rpc.scaffoldeth.io:48544",
 ];
 
+export const AppContext = createContext({});
+export const LayoutContext = createContext({});
+
 function App(props) {
+  const windowWidth = useWindowWidth();
+
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
   // reference './constants.js' for other networks
   const networkOptions = ["localhost", "mainnet", "rinkeby"];
@@ -128,6 +137,9 @@ function App(props) {
 
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
+  // The transactor wraps transactions and provides notificiations
+  const tx = Transactor(userSigner, gasPrice);
+
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
 
@@ -157,6 +169,9 @@ function App(props) {
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
 
+  const factoryAddress =
+    readContracts && readContracts.YourContractFactory && readContracts.YourContractFactory.address;
+
   // CREATED CONTRACTS
 
   // ** 📟 Listen for broadcast events
@@ -169,9 +184,9 @@ function App(props) {
   );
   console.log("📟 CreateYourContract events:", createYourContractEvents);
 
-  const [createdContracts, setCreatedContracts] = useState([]);
+  const [createdContracts, setCreatedContracts] = useState();
   useEffect(() => {
-    if (createdContracts.length !== createYourContractEvents.length) {
+    if (!createdContracts || createdContracts.length !== createYourContractEvents.length) {
       setCreatedContracts(
         createYourContractEvents
           .map(event => ({
@@ -184,7 +199,7 @@ function App(props) {
           .reverse(), // most recent first
       );
     }
-  }, [createYourContractEvents]);
+  }, [createYourContractEvents, address]);
 
   const [injectableAbis, setInjectableAbis] = useState();
   useEffect(() => {
@@ -262,153 +277,208 @@ function App(props) {
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
-  return (
-    <div className="App">
-      {/* ✏️ Edit the header and change the title to your project name */}
-      <Header />
-      <CustomNetworkDisplay
-        NETWORKCHECK={NETWORKCHECK}
-        localChainId={localChainId}
-        selectedChainId={selectedChainId}
-        targetNetwork={targetNetwork}
-        logoutOfWeb3Modal={logoutOfWeb3Modal}
-      />
-      <Menu style={{ display: "flex", justifyContent: "center" }} selectedKeys={[location.pathname]} mode="horizontal">
-        <Menu.Item key="/">
-          <Link to="/">Your Contracts</Link>
-        </Menu.Item>
-        <Menu.Item key="/debug">
-          <Link to="/debug">Debug Contracts</Link>
-        </Menu.Item>
-      </Menu>
+  const appContext = {
+    factoryAddress,
+    injectableAbis,
+    createdContracts,
+    contractConfig,
+    readContracts,
+    writeContracts,
+    userAddress: address,
+    tx,
+    userEthBalance: yourLocalBalance,
+    localProvider,
+    mainnetProvider,
+    gasPrice,
+    userSigner,
+    localChainId,
+    price,
+    DEBUG,
+    blockExplorer,
+  };
 
-      <div className="AppScroller">
-        <Switch>
-          <Route exact path="/">
-            <div className="AppCenteredCol">
-              <CreatedContractsUI
-                factoryAddress={readContracts.YourContractFactory.address}
-                userAddress={address}
-                injectableAbis={injectableAbis}
-                createdContracts={createdContracts}
-                readContracts={readContracts}
-                contractConfig={contractConfig}
-                gasPrice={gasPrice}
-                userSigner={userSigner}
-                localChainId={localChainId}
+  const layoutContext = {
+    windowWidth,
+  };
+
+  return (
+    <LayoutContext.Provider value={layoutContext}>
+      <AppContext.Provider value={appContext}>
+        <div className="App">
+          {/* ✏️ Edit the header and change the title to your project name */}
+          {/* <BrowserRouter> */}
+          <div
+            style={{
+              width: "fit-content",
+              borderRight: "1px solid #efefef",
+              borderBottom: "1px solid #efefef",
+              background: swapGradient,
+            }}
+          >
+            <Link to="/">
+              <CustomHeader />
+            </Link>
+          </div>
+
+          <Menu
+            style={{ display: "flex", justifyContent: "center" }}
+            selectedKeys={[location.pathname]}
+            mode="horizontal"
+          >
+            <Menu.Item key="/">
+              <Link to="/">Your Contracts</Link>
+            </Menu.Item>
+            <Menu.Item key="/debug">
+              <Link to="/debug">Debug Contracts</Link>
+            </Menu.Item>
+          </Menu>
+
+          <div className="AppScroller">
+            <Switch>
+              <Route exact path="/">
+                <div className="AppCenteredCol">
+                  <CreatedContractsUI
+                    factoryAddress={factoryAddress}
+                    userAddress={address}
+                    injectableAbis={injectableAbis}
+                    createdContracts={createdContracts}
+                    readContracts={readContracts}
+                    contractConfig={contractConfig}
+                    gasPrice={gasPrice}
+                    userSigner={userSigner}
+                    localChainId={localChainId}
+                    localProvider={localProvider}
+                    mainnetProvider={mainnetProvider}
+                    price={price}
+                    DEBUG={DEBUG}
+                  />
+                </div>
+              </Route>
+
+              <Route exact path="/debug">
+                <div className="AppCenteredCol">
+                  <DebugUI
+                    factoryName="YourContractFactory"
+                    createdContractName="YourContract"
+                    factoryAddress={factoryAddress}
+                    userAddress={address}
+                    createdContracts={createdContracts}
+                    injectableAbis={injectableAbis}
+                    localChainId={localChainId}
+                    localProvider={localProvider}
+                    blockExplorer={blockExplorer}
+                    userSigner={userSigner}
+                    contractConfig={contractConfig}
+                  />
+                </div>
+              </Route>
+            </Switch>
+          </div>
+          {/* </BrowserRouter> */}
+
+          <ThemeSwitch />
+
+          {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
+          <div
+            style={{
+              position: "fixed",
+              textAlign: "right",
+              right: 0,
+              top: 0,
+              padding: "0.5rem 1rem",
+              height: 55,
+            }}
+            className="hud hudTop"
+          >
+            <div style={{ display: "flex", flex: 1, gap: "1rem", alignItems: "center" }}>
+              <div>
+                <NetworkSwitch
+                  networkOptions={networkOptions}
+                  selectedNetwork={selectedNetwork}
+                  setSelectedNetwork={setSelectedNetwork}
+                />
+              </div>
+              <CustomAccount
+                address={address}
                 localProvider={localProvider}
+                userSigner={userSigner}
                 mainnetProvider={mainnetProvider}
                 price={price}
-                DEBUG={DEBUG}
-              />
-            </div>
-          </Route>
-
-          <Route exact path="/debug">
-            <div className="AppCenteredCol">
-              <DebugUI
-                factoryName="YourContractFactory"
-                createdContractName="YourContract"
-                factoryAddress={readContracts.YourContractFactory.address}
-                userAddress={address}
-                createdContracts={createdContracts}
-                injectableAbis={injectableAbis}
-                localChainId={localChainId}
-                localProvider={localProvider}
+                web3Modal={web3Modal}
+                loadWeb3Modal={loadWeb3Modal}
+                logoutOfWeb3Modal={logoutOfWeb3Modal}
                 blockExplorer={blockExplorer}
-                userSigner={userSigner}
-                contractConfig={contractConfig}
+                connectedNetworkDisplay={
+                  injectedProvider && (
+                    <CustomNetworkDisplay
+                      NETWORKCHECK={NETWORKCHECK}
+                      localChainId={localChainId}
+                      selectedChainId={selectedChainId}
+                      targetNetwork={targetNetwork}
+                      logoutOfWeb3Modal={logoutOfWeb3Modal}
+                    />
+                  )
+                }
               />
             </div>
-          </Route>
-        </Switch>
-      </div>
-
-      <ThemeSwitch />
-
-      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div
-        style={{
-          position: "fixed",
-          textAlign: "right",
-          right: 0,
-          top: 0,
-          padding: 10,
-        }}
-        className="hud hudTop"
-      >
-        <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
-          <div style={{ marginRight: 20 }}>
-            <NetworkSwitch
-              networkOptions={networkOptions}
-              selectedNetwork={selectedNetwork}
-              setSelectedNetwork={setSelectedNetwork}
-            />
+            <div style={{ position: "absolute", right: "6.4rem" }}>
+              {userSigner && (
+                <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
+              )}
+            </div>
           </div>
-          <Account
-            address={address}
-            localProvider={localProvider}
-            userSigner={userSigner}
-            mainnetProvider={mainnetProvider}
-            price={price}
-            web3Modal={web3Modal}
-            loadWeb3Modal={loadWeb3Modal}
-            logoutOfWeb3Modal={logoutOfWeb3Modal}
-            blockExplorer={blockExplorer}
-          />
+
+          {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
+          <div
+            style={{
+              position: "fixed",
+              textAlign: "left",
+              left: 0,
+              bottom: 20,
+              padding: 10,
+            }}
+            className="hud hudBottom"
+          >
+            <Row align="middle" gutter={[4, 4]}>
+              <Col span={8}>
+                <Ramp price={price} address={address} networks={NETWORKS} />
+              </Col>
+
+              <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
+                <GasGauge gasPrice={gasPrice} />
+              </Col>
+              <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+                <Button
+                  onClick={() => {
+                    window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
+                  }}
+                  size="large"
+                  shape="round"
+                >
+                  <span style={{ marginRight: 8 }} role="img" aria-label="support">
+                    💬
+                  </span>
+                  Support
+                </Button>
+              </Col>
+            </Row>
+
+            <Row align="middle" gutter={[4, 4]}>
+              <Col span={24}>
+                {
+                  /*  if the local provider has a signer, let's show the faucet:  */
+                  faucetAvailable ? (
+                    <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+                  ) : (
+                    ""
+                  )
+                }
+              </Col>
+            </Row>
+          </div>
         </div>
-        <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
-      </div>
-
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div
-        style={{
-          position: "fixed",
-          textAlign: "left",
-          left: 0,
-          bottom: 20,
-          padding: 10,
-        }}
-        className="hud hudBottom"
-      >
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={8}>
-            <Ramp price={price} address={address} networks={NETWORKS} />
-          </Col>
-
-          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-            <Button
-              onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-              }}
-              size="large"
-              shape="round"
-            >
-              <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                💬
-              </span>
-              Support
-            </Button>
-          </Col>
-        </Row>
-
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={24}>
-            {
-              /*  if the local provider has a signer, let's show the faucet:  */
-              faucetAvailable ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                ""
-              )
-            }
-          </Col>
-        </Row>
-      </div>
-    </div>
+      </AppContext.Provider>
+    </LayoutContext.Provider>
   );
 }
 

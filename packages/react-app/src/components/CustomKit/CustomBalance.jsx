@@ -1,53 +1,81 @@
 import React, { useState } from "react";
 import { useBalance } from "eth-hooks";
+import { exactFloatToFixed } from "../../helpers/numeric";
+import "./CustomBalance.css";
 
 const { utils } = require("ethers");
 
 /*
   Based on Balance component from scaffold-eth buidl kit
   Changed so that 
-  - it can be initialized in etherMode via props.
+  - it can be initialized in etherMode via props
   - padding is customizable
+  - decimals customizable
   - in etherMode it also displays the eth symbol
+  - toggle price on click can be disabled via noClick prop
+  - custom symbol can be used to represent currency (token ticker symbols etc.)
+
+  - MUST PROVIDE balance or value as prop, it should be available in parent component => one less call to rpc node
 */
 
-export default function CustomBalance(props) {
-  const [dollarMode, setDollarMode] = useState(!props.etherMode);
+export default function CustomBalance({
+  value,
+  balance,
+  price,
+  etherMode,
+  decimals,
+  dollarMultiplier,
+  customSymbol,
+  customColor,
+  noClick,
+  size,
+  padding,
+}) {
+  const [dollarMode, setDollarMode] = useState(!etherMode);
 
-  const balance = useBalance(props.provider, props.address);
+  const dollarDecimals = decimals ?? 2;
+  const ethDecimals = decimals ?? 4;
+
   let floatBalance = parseFloat("0.00");
-  let usingBalance = balance;
+  let usingBalance;
 
-  if (typeof props.balance !== "undefined") usingBalance = props.balance;
-  if (typeof props.value !== "undefined") usingBalance = props.value;
+  if (typeof balance !== "undefined") usingBalance = balance;
+  if (typeof value !== "undefined") usingBalance = value;
 
   if (usingBalance) {
     const etherBalance = utils.formatEther(usingBalance);
-    parseFloat(etherBalance).toFixed(2);
+    parseFloat(etherBalance).toFixed(dollarDecimals);
     floatBalance = parseFloat(etherBalance);
   }
 
-  let displayBalance = floatBalance.toFixed(4);
+  let displayBalance = exactFloatToFixed(floatBalance, ethDecimals);
 
-  const price = props.price || props.dollarMultiplier || 1;
+  const priceToUse = price || dollarMultiplier || 1;
+  const cursorType = !noClick ? "pointer" : "";
 
   if (dollarMode) {
-    displayBalance = "$" + (floatBalance * price).toFixed(2);
+    displayBalance = "$" + exactFloatToFixed(floatBalance * priceToUse, dollarDecimals);
   } else {
     displayBalance = "Ξ" + displayBalance;
   }
 
+  if (customSymbol !== undefined) {
+    displayBalance = `${customSymbol} ${displayBalance.substring(1)}`;
+  }
+
+  const handleClick = !noClick ? () => setDollarMode(!dollarMode) : null;
+
   return (
     <span
+      className="CustomBalance"
       style={{
         verticalAlign: "middle",
-        fontSize: props.size ? props.size : 24,
-        padding: props.padding ?? 8,
-        cursor: "pointer",
+        fontSize: size ? size : 24,
+        padding: padding ?? 8,
+        cursor: cursorType,
+        color: customColor ?? "",
       }}
-      onClick={() => {
-        setDollarMode(!dollarMode);
-      }}
+      onClick={handleClick}
     >
       {displayBalance}
     </span>

@@ -1,3 +1,4 @@
+import React from "react";
 import { Contract } from "..";
 import ContractDebugHeader from "./ContractDebugHeader";
 
