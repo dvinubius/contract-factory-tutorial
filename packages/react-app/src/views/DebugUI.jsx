@@ -1,24 +1,24 @@
 import { Button, Card, Divider, Space } from "antd";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Contract } from "../components";
 import ContractDebugHeader from "../components/Debug/ContractDebugHeader";
-import { mediumButtonMinWidth, primaryColor } from "../styles";
+import { mediumButtonMinWidth } from "../styles";
 import { LeftOutlined } from "@ant-design/icons";
 import ContractDebug from "../components/Debug/ContractDebug";
 import { getContractConfigWithInjected } from "../helpers/getContractConfigWithInjected";
+import { AppContext } from "../App";
 
-const DebugUI = ({
-  factoryName,
-  createdContractName,
-  factoryAddress,
-  createdContracts,
-  injectableAbis,
-  localChainId,
-  localProvider,
-  blockExplorer,
-  userSigner,
-  contractConfig,
-}) => {
+const DebugUI = ({ factoryName, createdContractName }) => {
+  const {
+    factoryAddress,
+    createdContracts,
+    injectableAbis,
+    localChainId,
+    localProvider,
+    blockExplorer,
+    userSigner,
+    contractConfig,
+  } = useContext(AppContext);
   const [openedDebugContract, setOpenedDebugContract] = useState();
   const handleBack = () => setOpenedDebugContract(null);
   return (

@@ -26,7 +26,7 @@ import { loadNonDeployedContractAbi } from "./helpers/loadNonDeployedAbis";
 import DebugUI from "./views/DebugUI";
 import CreatedContractsUI from "./views/CreatedContractsUI";
 import { useWindowWidth } from "@react-hook/window-size";
-import { softTextColor, swapGradient } from "./styles";
+import { breakPointContractItemFit, softTextColor, swapGradient } from "./styles";
 import CustomHeader from "./components/CustomKit/CustomHeader";
 import CustomAccount from "./components/CustomKit/CustomAccount";
 
@@ -299,6 +299,7 @@ function App(props) {
 
   const layoutContext = {
     windowWidth,
+    widthAboveContractItemFit: windowWidth >= breakPointContractItemFit,
   };
 
   return (
@@ -337,39 +338,13 @@ function App(props) {
             <Switch>
               <Route exact path="/">
                 <div className="AppCenteredCol">
-                  <CreatedContractsUI
-                    factoryAddress={factoryAddress}
-                    userAddress={address}
-                    injectableAbis={injectableAbis}
-                    createdContracts={createdContracts}
-                    readContracts={readContracts}
-                    contractConfig={contractConfig}
-                    gasPrice={gasPrice}
-                    userSigner={userSigner}
-                    localChainId={localChainId}
-                    localProvider={localProvider}
-                    mainnetProvider={mainnetProvider}
-                    price={price}
-                    DEBUG={DEBUG}
-                  />
+                  <CreatedContractsUI />
                 </div>
               </Route>
 
               <Route exact path="/debug">
                 <div className="AppCenteredCol">
-                  <DebugUI
-                    factoryName="YourContractFactory"
-                    createdContractName="YourContract"
-                    factoryAddress={factoryAddress}
-                    userAddress={address}
-                    createdContracts={createdContracts}
-                    injectableAbis={injectableAbis}
-                    localChainId={localChainId}
-                    localProvider={localProvider}
-                    blockExplorer={blockExplorer}
-                    userSigner={userSigner}
-                    contractConfig={contractConfig}
-                  />
+                  <DebugUI factoryName="YourContractFactory" createdContractName="YourContract" />
                 </div>
               </Route>
             </Switch>

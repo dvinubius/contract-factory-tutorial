@@ -1,11 +1,13 @@
 import { CheckCircleOutlined, PlusOutlined, StopOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Modal, Spin } from "antd";
 import { useContractLoader } from "eth-hooks";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { AppContext } from "../../App";
 import { Transactor } from "../../helpers";
-import { dialogOverlayGradient, errorColor, mainColWidth, mediumButtonMinWidth, primaryColor } from "../../styles";
+import { dialogOverlayGradient, errorColor, mainColWidthSmall, mediumButtonMinWidth, primaryColor } from "../../styles";
 
-const CreateYourContract = ({ userSigner, gasPrice, contractConfig, localChainId }) => {
+const CreateYourContract = () => {
+  const { userSigner, gasPrice, contractConfig, localChainId } = useContext(AppContext);
   // The transactor wraps transactions and provides notificiations
   const tx = Transactor(userSigner, gasPrice);
 
@@ -78,7 +80,7 @@ const CreateYourContract = ({ userSigner, gasPrice, contractConfig, localChainId
 
   return (
     <div>
-      <Button type="primary" onClick={() => setVisibleModal(true)}>
+      <Button type="primary" size="large" onClick={() => setVisibleModal(true)}>
         <PlusOutlined />
         New Contract
       </Button>
@@ -89,7 +91,7 @@ const CreateYourContract = ({ userSigner, gasPrice, contractConfig, localChainId
         visible={visibleModal}
         onOk={handleSubmit}
         onCancel={handleCancel}
-        width={mainColWidth}
+        width={mainColWidthSmall}
         footer={
           txSent
             ? [

@@ -3,6 +3,8 @@ export const primaryColor = "rgb(24, 144, 255)";
 export const softTextColor = "hsl(0, 0%, 50%)";
 
 export const cardGradient = "linear-gradient(-45deg, #40A9FF0c, transparent)";
+export const cardGradient2 = "linear-gradient(-45deg, #40A9FF0c, transparent, #40A9FF0c)";
+
 export const cardGradientGrey = "linear-gradient(-45deg, #DDDDDD1c, transparent)";
 
 export const nestedCardBGLight = "hsla(203,50%, 99%, 0.9)";
@@ -38,13 +40,12 @@ export const whiteBorder = `1px solid ${whiteBorderCol}`;
 
 export const pinkAccentBorder = "1px solid hsla(328, 60%, 24%, 0.22)";
 
-
 // layout
-export const mainColWidth = "35rem";
-
+export const mainColWidthSmall = "35rem";
+export const mainColWidthLarge = "50rem";
 
 export const lateralPadRem = 1;
-export const mainColWidthRem = 50;
 export const mediumButtonMinWidth = "7rem";
 
 export const breakPointAccountDisplayMinimize = 850;
+export const breakPointContractItemFit = 819;

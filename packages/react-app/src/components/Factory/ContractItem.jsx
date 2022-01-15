@@ -1,13 +1,16 @@
-import React from "react";
-import { softTextColor, primaryColor } from "../../styles";
+import React, { useContext } from "react";
+import { softTextColor, primaryColor, cardGradient, cardGradient2, mediumButtonMinWidth } from "../../styles";
 import { useContractReader } from "eth-hooks";
-import { Card, Descriptions } from "antd";
+import { Button, Card, Descriptions } from "antd";
 import CustomAddress from "../CustomKit/CustomAddress";
-import { UserOutlined } from "@ant-design/icons";
+import { ArrowsAltOutlined, UserOutlined } from "@ant-design/icons";
 import { useContractLoader } from "eth-hooks";
 import { getContractConfigWithInjected } from "../../helpers/getContractConfigWithInjected";
+import { AppContext, LayoutContext } from "../../App";
 
-const ContractItem = ({ openContract, contract, abi, localChainId, localProvider, userAddress }) => {
+const ContractItem = ({ openContract, contract }) => {
+  const { localChainId, localProvider, userAddress, injectableAbis } = useContext(AppContext);
+  const abi = injectableAbis.YourContract;
   /**
    * contractConfig not from props,
    * we create a copy in which we inject this particular contract
@@ -45,12 +48,16 @@ const ContractItem = ({ openContract, contract, abi, localChainId, localProvider
   //     ""
   //   );
 
+  const { widthAboveContractItemFit } = useContext(LayoutContext);
+
   const cellHeight = "2.5rem";
+  const descriptionSpan = widthAboveContractItemFit ? 0 : 3;
+
   return (
     <Card
       size="small"
+      style={{ background: cardGradient2 }}
       className="hoverableLight"
-      onClick={() => openContract(contract)}
       title={
         <div
           style={{
@@ -62,8 +69,39 @@ const ContractItem = ({ openContract, contract, abi, localChainId, localProvider
             fontWeight: 400,
           }}
         >
-          <div style={{ fontSize: "1rem", fontWeight: 500 }}>{contract.name}</div>
-          <CustomAddress noBlockie={true} fontSize="1rem" value={contract.address} />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              flex: "66%",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "1.125rem",
+                fontWeight: 400,
+
+                // color: softTextColor,
+              }}
+            >
+              {contract.name}
+            </div>
+            <CustomAddress fontSize={18} value={contract.address} />
+          </div>
+          <Button
+            size="large"
+            style={{
+              fontSize: "1rem",
+
+              width: mediumButtonMinWidth,
+            }}
+            onClick={() => openContract(contract)}
+          >
+            Open <ArrowsAltOutlined />
+          </Button>
         </div>
       }
     >
@@ -74,14 +112,13 @@ const ContractItem = ({ openContract, contract, abi, localChainId, localProvider
             labelStyle={{ color: softTextColor }}
             contentStyle={{
               padding: "0 1rem",
-              width: "10rem",
             }}
-            span={3}
+            span={descriptionSpan}
           >
-            <div>{contract.time.toLocaleString()}</div>
+            <div className="mono-nice">{contract.time.toLocaleString()}</div>
           </Descriptions.Item>
           <Descriptions.Item
-            label="Creator"
+            label="By"
             labelStyle={{ color: softTextColor }}
             contentStyle={{
               padding: "0 1rem",
@@ -91,13 +128,13 @@ const ContractItem = ({ openContract, contract, abi, localChainId, localProvider
               justifyContent: "center",
               width: "100%",
             }}
-            span={3}
+            span={descriptionSpan}
           >
             <CustomAddress fontSize={14} value={contract.creator} />
           </Descriptions.Item>
           {/* <Descriptions.Item
             label="Owner"
-            labelStyle={{ color: softTextColor, width: "8rem" }}
+            labelStyle={{ color: softTextColor }}
             contentStyle={{
               padding: "0 1rem",
               height: cellHeight,
@@ -107,7 +144,7 @@ const ContractItem = ({ openContract, contract, abi, localChainId, localProvider
               width: "100%",
               position: "relative",
             }}
-            span={3}
+            span={descriptionSpan}
           >
             <CustomAddress fontSize={14} value={owner} />
             {

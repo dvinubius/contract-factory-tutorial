@@ -1,16 +1,20 @@
 import { Button, Card, Divider, Spin } from "antd";
 import { useContractLoader, useContractReader } from "eth-hooks";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import externalContracts from "../../contracts/external_contracts";
 import deployedContracts from "../../contracts/hardhat_contracts.json";
-import { cardGradient, mainColWidth, primaryColor } from "../../styles";
+import { cardGradient, mainColWidthLarge, mainColWidthSmall, mediumButtonMinWidth, primaryColor } from "../../styles";
 import { Transactor } from "../../helpers";
 import CustomAddress from "../CustomKit/CustomAddress";
 import CustomEvents from "../CustomKit/CustomEvents";
 import { getContractConfigWithInjected } from "../../helpers/getContractConfigWithInjected";
+import { AppContext, LayoutContext } from "../../App";
 
-const YourContract = ({ contract, injectableAbis, localProvider, userSigner, localChainId, gasPrice }) => {
+const YourContract = ({ contract }) => {
+  const { injectableAbis, localProvider, userSigner, localChainId, gasPrice } = useContext(AppContext);
+  const { widthAboveContractItemFit } = useContext(LayoutContext);
+
   // The transactor wraps transactions and provides notificiations
   const tx = Transactor(userSigner, gasPrice);
 
@@ -52,7 +56,8 @@ const YourContract = ({ contract, injectableAbis, localProvider, userSigner, loc
     <div>
       <Card
         style={{
-          width: mainColWidth,
+          width: "100%",
+          maxWidth: widthAboveContractItemFit ? mainColWidthLarge : mainColWidthSmall,
           margin: "0 auto",
           background: cardGradient,
         }}

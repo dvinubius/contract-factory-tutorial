@@ -36,10 +36,10 @@
 
 .hoverableLight {
   transition: all 0.1s ease-out;
-  cursor: pointer;
 }
 .hoverableLight:hover {
-  background-color: hsla(209deg, 100%, 92%, 0.1);
+  background-color: hsla(209deg, 100%, 92%, 0.13) !important;
+  /* border: 1px solid hsla(209deg, 100%, 32%, 0.2); */
 }
 
 .DebugHeader {
@@ -53,4 +53,7 @@
 }
 .hoverableDebugHeader:hover {
   background: var(--bgCol);
+}
+.mono-nice {
+  font-family: "Roboto Mono", monospace;
 }
