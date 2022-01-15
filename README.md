@@ -290,8 +290,25 @@ Here is a simple solution for that:
 
 # Final Thoughts
 
+## 0 Key Improvements
+
+A factory setup can quickly get very complex, especially if you want to provide good UX.
+
+In your real-world project will probably need code design improvements in order to be able to scale well and be easy to use.
+- good routing
+- efficient data retrieval (RPC nodes)
+- different empty states (waiting for data, data not available, no account connected)
+- clean code
+
+Some design patterns to help you grow can be found in this [repo](https://github.com/dvinubius/tiny-multisig).
+- master-detail UI pattern with **shareable links** to detail pages (routing with **react router v6**)
+- a pattern on how to create a **contract specific react context** when opening a contract in the UI
+- strategies to **minimize** number of **RPC calls** while using eth-hooks v2.
+
+eth-hooks v4 is a much more advanced toolkit but it requires you to use the [typescript flavored](https://github.com/scaffold-eth/scaffold-eth-typescript) scaffold-eth.
+
 ## 1 Opinionated Solutions
-Our approaches in solving UX challenges depend on many factors. If your project is going to have lots of complex data to retrieve, you'll probably use a [**subgraph**](https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph) or other web3 indexing tools like [Moralis](https://docs.moralis.io/moralis-server/automatic-transaction-sync/smart-contract-events). These are more capable than the ```useEventListener``` hook we've used here. This would impact how you approach scaling your dApp.
+Our approaches in solving UX challenges depend on many factors. If your project is going to have lots of complex data to retrieve, you'll probably also use a [**subgraph**](https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph) or other web3 indexing tools like [Moralis](https://docs.moralis.io/moralis-server/automatic-transaction-sync/smart-contract-events). These are more capable than the ```useEventListener``` hook we've used here. This would impact how you approach scaling your dApp.
 
 ## 2 Factory Use Cases
 
