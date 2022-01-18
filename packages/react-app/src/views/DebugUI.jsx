@@ -93,7 +93,7 @@ const DebugUI = ({ factoryName, createdContractName }) => {
                     contractConfig: contractCfg,
                   });
                 return (
-                  <div size="small" className="hoverableLight" key={createdContract.address} onClick={handleOpen}>
+                  <div className="hoverableLight" key={createdContract.address} onClick={handleOpen}>
                     <ContractDebugHeader contract={createdContract} hoverable />
                   </div>
                 );

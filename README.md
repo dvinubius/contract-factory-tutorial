@@ -1,4 +1,4 @@
-# 🏗 Tutorial / Starter Kit: Build a Dynamic Multi-Contract dApp
+# 🏗 Tutorial / Starter Kit: Factory dApp - Build a Smart Contract Manager
 
 > A Starter Kit for dApps where **users** can create and manage multiple contracts
 
@@ -78,6 +78,7 @@ yarn deploy
 📱 Open http://localhost:3000 to see the app
 
 # Tutorial 
+## Goals
 
 Whether you're a web3 noob or experienced dev, the following tutorial is a good way to 
 - get more **familiar with scaffold-eth**
@@ -87,7 +88,7 @@ If you're in for the tutorial, you're in for a treat! 🍭 🤓 Here's what we'l
 
 1. Explore the setup - what can a user do?
 2. Technicalities - how is it built so far?
-3. UX challenges - where can we take it from here? 
+3. UX challenges - where can you take it from here? 
 # 1. 🤩 Explore the setup
 
 > 🔖 **Create and track** contracts that each have a "purpose" variable
@@ -148,7 +149,7 @@ Return to the UI where you have 2 buttons to set the purpose of a contract.
 
 - Kept as lean as possible. 
  
-The setup allows **users to create** their own YourContracts **and control them** independent of the factory contract.
+The setup allows **users to create** their own YourContracts **and control them** independent from the factory contract.
 
 As a starting point for developing dApps with this setup, we want **loose coupling**:
 - keep created contracts unaware of the factory
@@ -166,7 +167,7 @@ We emit **events on contract creation**, so the frontend can easily retrieve a l
 ![Screenshot 2021-12-25 at 21 20 20](https://user-images.githubusercontent.com/32189942/147392136-c64bf671-4ffd-423e-bcf5-1fe76d74a1c5.png)
 ![Screenshot 2021-12-25 at 21 19 58](https://user-images.githubusercontent.com/32189942/147392138-d4351c71-f5ec-4d6a-8a09-29f0693a3fdd.png)
 
-We've include useful data in those events.
+We've included useful data in those events.
 
 ## 📇 Readable Names
 👩‍💻 😍 **UX** 😍 🧑‍💻 
@@ -175,6 +176,9 @@ In a dApp based on a setup like ours, user-given **individual contract names** a
 We've adopted a *simple and cheap* solution: the user-given name is put in the creation event. If the name doesn't need to change over time this approach works fine.
 
 This retrieval happens via **a single RPC** call by using the ```useEventListener``` hook.
+The retrieval happens once on every new block. 
+
+It's good to something like this in mind in order to have your app scale well when the UI is rich and lots of users are using it at the same time. It may produce many RPC calls.
 
 For **contract state**, like "purpose", contract owner, etc. the frontend uses the address of a particular YourContract intance address to read from the contract, which under the hood makes separate RPC calls.
 
@@ -183,7 +187,11 @@ This is what we do in ```<YourContract/>```
 ![Screenshot 2021-12-25 at 21 36 39](https://user-images.githubusercontent.com/32189942/147392368-075e8d90-d875-4758-81f0-8c9202e174f0.png)
 
 
-## 👨🏻‍💻 🤓  Code Design : Injection! 💉
+## 👨🏻‍💻 🤓  Knitty Gritty Aside on Code Design : Injection! 💉
+You may skip this section and tackle Challenge 1 below, if you're eager to code some more. Just make sure to return here some time later. 
+
+Understanding this is crucial if you're serious about building factory pattern dApps, so you'll need to do it anyway. But no pressure right now 😎 🧉
+
 > 📝 If you're familiar with scaffold-eth, notice the pattern: we **dynamically inject** the ```YourContract``` **abi** and the particular contract instance address into a locally created ```contractConfig```. 
 > 
 > After that it's business as usual with ```useContractLoader```. 
@@ -250,7 +258,7 @@ Go to ```ContractItem.jsx``` and find the code that fetches owner data. Uncommen
 Now you should see owner information in the contracts list of the master view.
 
 ### 👩‍💻 😍 🧑‍💻 **Recognize** my contract
-> Owner addresses are hard quite to read. In the contracts list, let's **mark** items which belong to **the current user** so they may be identified more easily.
+> Owner addresses are quite hard to read. In the contracts list, let's **mark** items which belong to **the current user** so they may be identified more easily.
 
 Go to the code inside the ```<ContractItem/>``` component. Find the commented code which marks the item when the contract owner is the current user. Uncomment it.
 
@@ -260,7 +268,7 @@ You should now see contract items like this:
 
 ☑️ Test the functionality by creating contracts from an incognito window. Compare the views of different users.
 
-## **Challenge** 3 -- Scalable UI  
+## **Challenge** 3 -- Scalable UI (hard)
 
 > What if there were 100 contracts? 
 > 
@@ -276,7 +284,7 @@ Here is a simple solution for that:
 > - This would improve the UX a lot, whether we display contract owners or not
 > - If you allow n contracts per page, only n calls to read the owner will be made at once.
 
-## Advanced UX Side Quests 
+## Other advanced UX Side Quests 
 
 > 👩‍💻 😍 🧑‍💻  Allow users to **filter** contracts by name in the list view 
 
@@ -294,7 +302,7 @@ Here is a simple solution for that:
 
 A factory setup can quickly get very complex, especially if you want to provide good UX.
 
-In your real-world project will probably need code design improvements in order to be able to scale well and be easy to use.
+Your real-world project will probably need code design improvements in order to be able to scale well and be easy to use.
 - good routing
 - efficient data retrieval (RPC nodes)
 - different empty states (waiting for data, data not available, no account connected)

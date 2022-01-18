@@ -42,7 +42,7 @@ export const pinkAccentBorder = "1px solid hsla(328, 60%, 24%, 0.22)";
 
 // layout
 export const mainColWidthSmall = "35rem";
-export const mainColWidthLarge = "50rem";
+export const mainColWidthLarge = "60rem";
 
 export const lateralPadRem = 1;
 export const mediumButtonMinWidth = "7rem";

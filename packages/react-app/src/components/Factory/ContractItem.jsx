@@ -126,7 +126,8 @@ const ContractItem = ({ openContract, contract }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "100%",
+              width: "max-content",
+              margin: "auto",
             }}
             span={descriptionSpan}
           >
@@ -141,7 +142,8 @@ const ContractItem = ({ openContract, contract }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "100%",
+              width: 'max-content',
+              margin: 'auto',
               position: "relative",
             }}
             span={descriptionSpan}
