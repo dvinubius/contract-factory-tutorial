@@ -9,7 +9,7 @@ export const exactFloatToFixed = (floatOrString, val) => {
   if (ret.indexOf(".") === -1) {
     ret = ret + "0000";
   } else {
-    const decimals = ret.substr(ret.indexOf(".")) + 1;
+    const decimals = Number(+ret.substr(ret.indexOf("."))) + 1;
     if (decimals === 1) {
       ret = ret + "000";
     } else if (decimals === 2) {
