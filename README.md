@@ -308,7 +308,7 @@ Some design patterns to help you grow can be found in this [repo](https://github
 eth-hooks v4 is a much more advanced toolkit but it requires you to use the [typescript flavored](https://github.com/scaffold-eth/scaffold-eth-typescript) scaffold-eth.
 
 ## 1 Opinionated Solutions
-Our approaches in solving UX challenges depend on many factors. If your project is going to have lots of complex data to retrieve, you'll probably also use a [**subgraph**](https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph) or other web3 indexing tools like [Moralis](https://docs.moralis.io/moralis-server/automatic-transaction-sync/smart-contract-events). These are more capable than the ```useEventListener``` hook we've used here. This would impact how you approach scaling your dApp.
+Our approaches in solving UX challenges depend on many factors. If your project is going to have lots of complex data to retrieve, you'll probably also use a [**subgraph**](https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph) or other blockchain indexing tools. These are more capable than the ```useEventListener``` hook we've used here. This would impact how you approach scaling your dApp.
 
 ## 2 Factory Use Cases
 
